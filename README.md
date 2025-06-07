@@ -108,20 +108,7 @@ QOQ growth = DIVIDE(([Total Rev] - [Prev qtr]), [Prev qtr])
 
 ---
 
-### 🔹 7. Exporting Code
 
-#### 🟦 DAX Measures
-
-- Open DAX Studio → Connect to PBIX  
-- Run: `EVALUATE SUMMARIZECOLUMNS(...)` to export measures  
-- Or copy/paste manually into `All_DAX_Measures.txt`
-
-#### 🟩 Power Query M Code
-
-- Go to Power BI → Transform Data  
-- Click `Advanced Editor` → Copy the full script to `PowerQuery_MCode.txt`
-
----
 
 ## 📁 Repository Structure
 
