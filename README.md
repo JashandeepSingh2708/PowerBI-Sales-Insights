@@ -128,12 +128,16 @@ QOQ growth = DIVIDE(([Total Rev] - [Prev qtr]), [Prev qtr])
 ```
 📂 PowerBI-Sales-Insights/
 ├── 📘 README.md
-├── 📄 DAX_Measures_PowerBI.pdf
-├── 📄 All_DAX_Measures.txt
-├── 📄 PowerQuery_MCode.txt
 ├── 📊 Sales_Insights_Dashboard.pbix
+├── 📄 DAX_Measures_PowerBI.pdf
+├── 📄 Sales_Report.png
+├── 📄 Product.csv
+├── 📄 Sales-20250607T153612Z-1-001.xlsx
+├── 📄 Categories.xlsx
+├── 📄 SubCategories.xlsx
+├── 📄 Geography.xlsx
+├── 📄 SalesRep.xlsx
 ```
-
 ---
 
 
