@@ -3,109 +3,142 @@ Power BI Sales Dashboard project involving end-to-end data integration, transfor
 
 # 📊 Power BI Sales Insights Dashboard
 
-This Power BI project presents a comprehensive sales dashboard that offers insights into performance across multiple years and geographies. It demonstrates key aspects of a full business intelligence pipeline including data transformation, modeling, DAX calculations, and compelling visual storytelling.
+This repository showcases a comprehensive and interactive Sales Analytics Dashboard built in Power BI. It analyzes sales data from multiple years across products, geographies, categories, and sales representatives. The solution integrates data transformation (Power Query), data modeling (star schema), and dynamic metrics (DAX) to present actionable business insights via a one-page dashboard.
 
 ---
 
-## 🚀 Project Overview
+## 🚀 Overview
 
-**Goal**: To build a dynamic and responsive Power BI dashboard that summarizes sales data, identifies top products and sales reps, and evaluates quarter-over-quarter and month-over-month performance metrics.
-
----
-
-## 📂 Data Sources
-
-- `Sales` data (Yearly Excel/CSV files for 2014-2017)
-- `Categories` (Excel)
-- `SubCategories` (Excel)
-- `Geography` (Excel)
-- `Product` (CSV)
-- `SalesRep` (Excel)
+- **Domain**: Sales Analytics  
+- **Years Covered**: 2014 – 2017  
+- **Tools Used**: Power BI, DAX, Power Query (M), Excel, CSV  
+- **Objective**: Build an end-to-end dashboard for sales performance insights with dynamic visualizations and growth metrics (MoM, QoQ)
 
 ---
 
-## 🔧 Steps Followed
+## 📂 Workflow Breakdown
 
-### 1. 📥 Data Collection
-- Imported datasets from Excel and CSV files.
-- Combined yearly sales data (2014–2017) using **Power Query** with a **folder-based approach** for automatic updates.
+### 🔹 1. Data Collection
 
-### 2. 🧹 Data Cleaning & Transformation
-- Split the `Location` column into `Country` and `City`.
-- Created a unique `GeoKey` in both `Sales` and `Geography` tables.
-- Cleaned `SalesRepID` and `SubCategoryKey` by removing prefix using a reusable Power Query function.
-
-### 3. 🧠 Data Modeling
-- Created a **Date table** using DAX: `CALENDAR(FIRSTDATE(), LASTDATE())`.
-- Built relationships between:
-  - Sales ↔ Product
-  - Sales ↔ DateMaster
-  - Sales ↔ Geography
-  - Sales ↔ SalesRep
-  - Product ↔ SubCategory ↔ Category
-
-### 4. 📊 DAX Calculations
-
-| Measure | Formula |
-|--------|---------|
-| Total Revenue | `Sales[Units] * RELATED(Product[RetailPrice])` |
-| Total Cost | `Sales[Units] * RELATED(Product[StandardCost])` |
-| Gross Profit | `Sales[Total Revenue] - Sales[Total Cost]` |
-| MoM Growth | `([Tot Profit] - [Previous Month Profit]) / [Previous Month Profit]` |
-| QoQ Growth | `([Total Rev] - [Prev qtr]) / [Prev qtr]` |
-| AVG Sales/Day | `AVERAGEX(VALUES(Sales[Date]), [Total Rev])` |
-
-➡️ [Full list of DAX Measures (PDF)](./DAX_Measures_PowerBI.pdf)
+- Sales data (2014–2017): Excel files, imported using folder connector  
+- Product data: CSV file  
+- Lookup tables (Category, SubCategory, SalesRep, Geography): Excel files
 
 ---
 
-## 📈 Visualizations Used
+### 🔹 2. Data Cleaning & Transformation (Power Query)
+
+- 📁 **Appended** all sales files into a single table using folder import (auto-refresh supported)
+- 🧹 **Split `Location`** column into `Country` and `Town`
+- 🧽 **Removed “ID - ” prefix** from SalesRepID and SubCategoryID using a reusable M function
+- 🔗 Created `GeoKey` column in both `Sales` and `Geography` tables
+- 📆 Ensured proper date formats and column data types
+
+---
+
+### 🔹 3. Data Modeling
+
+- Built a **Star Schema**:
+  - `Sales` → Fact table  
+  - Dimensions: `Product`, `SubCategory`, `Category`, `SalesRep`, `Geography`, `DateMaster`
+- Used DAX to create a **Calendar Table** (`DateMaster`)
+- Defined correct relationships and cardinality between tables
+
+---
+
+### 🔹 4. DAX Measures
 
 <details>
-<summary>Click to Expand Visualization List</summary>
+<summary>📐 Click to view all DAX measures</summary>
 
-- 📌 **Total Revenue / Gross Profit / Units Sold Cards**
-- 📊 **Stacked Column Chart** for Revenue by Product and Subcategory
-- 🥧 **Pie Chart** for Sub Category Share
-- 💼 **Top 5 Sales Reps** as a bar list
-- 🟠 **Donut Chart** for Revenue by Category
-- 📆 **Waterfall Chart** for Revenue by Year & Product
-- 📈 **Line Chart** for:
-  - QoQ Revenue Growth
-  - MoM Gross Profit Growth
+```dax
+-- Calendar Columns
+DateMaster = CALENDAR(FIRSTDATE(Sales[Date]), LASTDATE(Sales[Date]))
+Month = MONTH(DateMaster[Date])
+Month Name = FORMAT(DateMaster[Date], "MMM")
+Month Order = DateMaster[Date].[MonthNo]
+Quarter = QUARTER(DateMaster[Date])
+Week Day = WEEKDAY(DateMaster[Date])
+Week Day Name = FORMAT(DateMaster[Date], "DDD")
+Week number = WEEKNUM(DateMaster[Date])
+Year = YEAR(DateMaster[Date])
+
+-- Metrics
+Total Revenue = Sales[Units] * RELATED(Product[RetailPrice])
+Total Cost = Sales[Units] * RELATED(Product[StandardCost])
+Gross Profit = Sales[Total Revenue] - Sales[Total Cost]
+
+Tot Profit = SUM(Sales[Gross Profit])
+Total Rev = SUM(Sales[Total Revenue])
+Prvious Month Profit = CALCULATE([Tot Profit], PREVIOUSMONTH(DateMaster[Date]))
+MoM Growth = DIVIDE(([Tot Profit] - [Prvious Month Profit]), [Prvious Month Profit])
+Prev qtr = CALCULATE([Total Rev], PREVIOUSQUARTER(DateMaster[Date]))
+QOQ growth = DIVIDE(([Total Rev] - [Prev qtr]), [Prev qtr])
+```
+
 </details>
 
 ---
 
-## 🖥️ Dashboard Features
+### 🔹 5. Data Exploration & Insights
 
-- Filter by Country, Year, and Month.
-- Dynamic calculations using DAX.
-- Handles new/removed files automatically via folder-based Power Query.
-- Responsive to slicers and time filters.
-- Scrollable visual.
-
----
-
-## 🛠️ How to Create Power BI M Code and DAX Measure Files
-
-1. **DAX Measures**: Go to **Modeling > New Measure**, copy-paste the formula.
-2. **M Code (Power Query)**:
-   - Use **Advanced Editor** in Power Query to extract M code.
-   - File > Advanced Editor > Copy entire query logic.
-   - Save as `.txt` or `.m` file for documentation.
-3. You can also export M queries by:
-   - Right-click query > **Properties** > Copy code or export steps manually.
+- Tracked Total Revenue, Total Cost, and Gross Profit
+- Compared performance across time using MoM and QoQ
+- Analyzed which Products, Categories, and Sales Reps drive most revenue
+- Filtered sales by Country, Year, Month
 
 ---
 
-## 📎 Project Status
+### 🔹 6. Dashboard & Visualizations
 
-✅ Completed and tested  
-📤 Published to GitHub with documentation  
-📅 Can be enhanced by including drill-through reports or R/Python visuals in future
+| Visual Type        | Usage                                        |
+|--------------------|----------------------------------------------|
+| KPI Cards          | Total Revenue, Gross Profit, Units           |
+| Pie/Donut Charts   | Category & Subcategory share                 |
+| Clustered Bar      | Revenue by Product, SubCategory              |
+| Waterfall Chart    | Contribution breakdown by Product/Year       |
+| Line Chart         | MoM & QoQ growth trend                       |
+| Slicers            | Filter by Country, Year, Month               |
+| Table/Matrix       | Detailed drill-down data                     |
+| Scroll bar         | Applied to bar chart with long product list  |
+
+✅ Months are sorted from Jan–Dec using `Month Order` column  
+✅ Filters sync across visuals  
+✅ Scroll enabled for overflown bar/line charts (like top N products)
 
 ---
+
+### 🔹 7. Exporting Code
+
+#### 🟦 DAX Measures
+
+- Open DAX Studio → Connect to PBIX  
+- Run: `EVALUATE SUMMARIZECOLUMNS(...)` to export measures  
+- Or copy/paste manually into `All_DAX_Measures.txt`
+
+#### 🟩 Power Query M Code
+
+- Go to Power BI → Transform Data  
+- Click `Advanced Editor` → Copy the full script to `PowerQuery_MCode.txt`
+
+---
+
+## 📁 Repository Structure
+
+```
+📂 PowerBI-Sales-Insights/
+├── 📘 README.md
+├── 📄 DAX_Measures_PowerBI.pdf
+├── 📄 All_DAX_Measures.txt
+├── 📄 PowerQuery_MCode.txt
+├── 📊 Sales_Insights_Dashboard.pbix
+```
+
+---
+
+
+
+
 
 ## 📧 Contact
 
